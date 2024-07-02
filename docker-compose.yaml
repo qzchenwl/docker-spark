@@ -2,11 +2,9 @@ services:
   hadoop-namenode:
     image: apache/hadoop:3
     container_name: hadoop-namenode
-    environment:
-      - CLUSTER_NAME=test
-    command: ["sh", "-c", "hdfs namenode -format && hdfs namenode"]
+    command: ["hdfs", "namenode"]
     volumes:
-      - namenode:/hadoop/dfs/name
+      - ./volumes/namenode:/hadoop/dfs/name
       - ./config/hadoop/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
       - ./config/hadoop/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
     ports:
@@ -18,11 +16,9 @@ services:
   hadoop-datanode:
     image: apache/hadoop:3
     container_name: hadoop-datanode
-    environment:
-      - CLUSTER_NAME=test
     command: ["hdfs", "datanode"]
     volumes:
-      - datanode:/hadoop/dfs/data
+      - ./volumes/datanode:/hadoop/dfs/data
       - ./config/hadoop/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
       - ./config/hadoop/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
     networks:
@@ -75,11 +71,15 @@ services:
       - HIVE_METASTORE_USER=hive
       - HIVE_METASTORE_PASSWORD=hive
       - HIVE_METASTORE_DB_TYPE=postgres
-      - IS_RESUME=true
+      - IS_RESUME=${IS_RESUME:-true}
     ports:
       - "9083:9083"
     depends_on:
       - postgres
+      - hadoop-namenode
+      - hadoop-datanode
+      - hadoop-yarn-resourcemanager
+      - hadoop-yarn-nodemanager
     volumes:
       - ./config/hive/hive-site.xml:/opt/hive/conf/hive-site.xml
     networks:
@@ -95,6 +95,8 @@ services:
       - "7077:7077"
     volumes:
       - ./config/spark/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
+    depends_on:
+      - hive-server
     networks:
       - hadoop
 
@@ -106,6 +108,25 @@ services:
       - SPARK_MASTER_URL=spark://spark-master:7077
     ports:
       - "8081:8081"
+    volumes:
+      - ./config/spark/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
+    depends_on:
+      - spark-master
+    networks:
+      - hadoop
+
+  spark-thriftserver:
+    image: bitnami/spark:3.4.3
+    container_name: spark-thriftserver
+    environment:
+      - SPARK_MODE=thrift
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    ports:
+      - "10001:10000"
+    volumes:
+      - ./config/spark/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
+      - ./scripts/spark/run.sh:/opt/bitnami/scripts/spark/run.sh
+      - ./scripts/spark/libspark.sh:/opt/bitnami/scripts/libspark.sh
     depends_on:
       - spark-master
     networks:
@@ -119,14 +140,9 @@ services:
       - POSTGRES_USER=hive
       - POSTGRES_PASSWORD=hive
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./volumes/pgdata:/var/lib/postgresql/data
     networks:
       - hadoop
-
-volumes:
-  namenode:
-  datanode:
-  pgdata:
 
 networks:
   hadoop:

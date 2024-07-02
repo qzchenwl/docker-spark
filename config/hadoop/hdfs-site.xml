@@ -3,5 +3,15 @@
     <name>dfs.replication</name>
     <value>1</value>
   </property>
+  <!-- Namenode 数据目录 -->
+  <property>
+      <name>dfs.namenode.name.dir</name>
+      <value>file:///hadoop/dfs/name</value>
+  </property>
+  <!-- Datanode 数据目录 -->
+  <property>
+      <name>dfs.datanode.data.dir</name>
+      <value>file:///hadoop/dfs/data</value>
+  </property>
 </configuration>
 
