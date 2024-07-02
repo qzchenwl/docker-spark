@@ -1,0 +1,130 @@
+services:
+  hadoop-namenode:
+    image: apache/hadoop:3
+    container_name: hadoop-namenode
+    environment:
+      - CLUSTER_NAME=test
+    command: ["sh", "-c", "hdfs namenode -format && hdfs namenode"]
+    volumes:
+      - namenode:/hadoop/dfs/name
+      - ./config/hadoop/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hadoop/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+    networks:
+      - hadoop
+
+  hadoop-datanode:
+    image: apache/hadoop:3
+    container_name: hadoop-datanode
+    environment:
+      - CLUSTER_NAME=test
+    command: ["hdfs", "datanode"]
+    volumes:
+      - datanode:/hadoop/dfs/data
+      - ./config/hadoop/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hadoop/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+    networks:
+      - hadoop
+
+  hadoop-yarn-resourcemanager:
+    image: apache/hadoop:3
+    container_name: hadoop-yarn-resourcemanager
+    command: ["yarn", "resourcemanager"]
+    ports:
+      - "8088:8088"
+    volumes:
+      - ./config/hadoop/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+    networks:
+      - hadoop
+
+  hadoop-yarn-nodemanager:
+    image: apache/hadoop:3
+    container_name: hadoop-yarn-nodemanager
+    command: ["yarn", "nodemanager"]
+    volumes:
+      - ./config/hadoop/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+    networks:
+      - hadoop
+
+  hive-server:
+    image: apache/hive:3.1.3
+    container_name: hive-server
+    environment:
+      - SERVICE_NAME=hiveserver2
+      - DB_DRIVER=postgres
+    ports:
+      - "10000:10000"
+    depends_on:
+      - hive-metastore
+    volumes:
+      - ./config/hive/hive-site.xml:/opt/hive/conf/hive-site.xml
+    networks:
+      - hadoop
+
+  hive-metastore:
+    image: apache/hive:3.1.3
+    container_name: hive-metastore
+    environment:
+      - SERVICE_NAME=metastore
+      - DB_DRIVER=postgres
+      - HIVE_METASTORE_DB_HOST=postgres
+      - HIVE_METASTORE_DB=metastore
+      - HIVE_METASTORE_USER=hive
+      - HIVE_METASTORE_PASSWORD=hive
+      - HIVE_METASTORE_DB_TYPE=postgres
+    ports:
+      - "9083:9083"
+    depends_on:
+      - postgres
+    volumes:
+      - ./config/hive/hive-site.xml:/opt/hive/conf/hive-site.xml
+    networks:
+      - hadoop
+
+  spark-master:
+    image: bitnami/spark:3.4.3
+    container_name: spark-master
+    environment:
+      - SPARK_MODE=master
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    volumes:
+      - ./config/spark/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
+    networks:
+      - hadoop
+
+  spark-worker:
+    image: bitnami/spark:3.4.3
+    container_name: spark-worker
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    ports:
+      - "8081:8081"
+    depends_on:
+      - spark-master
+    networks:
+      - hadoop
+
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      - POSTGRES_DB=metastore
+      - POSTGRES_USER=hive
+      - POSTGRES_PASSWORD=hive
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - hadoop
+
+volumes:
+  namenode:
+  datanode:
+  pgdata:
+
+networks:
+  hadoop:

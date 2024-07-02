@@ -1,0 +1,7 @@
+<configuration>
+  <property>
+    <name>yarn.resourcemanager.hostname</name>
+    <value>hadoop-yarn-resourcemanager</value>
+  </property>
+</configuration>
+
