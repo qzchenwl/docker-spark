@@ -54,6 +54,7 @@ services:
     environment:
       - SERVICE_NAME=hiveserver2
       - DB_DRIVER=postgres
+      - IS_RESUME=true
     ports:
       - "10000:10000"
     depends_on:
@@ -74,6 +75,7 @@ services:
       - HIVE_METASTORE_USER=hive
       - HIVE_METASTORE_PASSWORD=hive
       - HIVE_METASTORE_DB_TYPE=postgres
+      - IS_RESUME=true
     ports:
       - "9083:9083"
     depends_on:
