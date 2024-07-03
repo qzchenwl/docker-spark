@@ -177,5 +177,19 @@ services:
     networks:
       - hadoop
 
+  frpc:
+    image: fatedier/frpc:v0.58.1
+    container_name: frpc
+    hostname: frpc
+    restart: on-failure
+    command: [ "-c", "/frpc.ini" ]
+    volumes:
+      - ./config/frp/frpc.ini:/frpc.ini
+    environment:
+      - SAKURA_FRP_USER=${SAKURA_FRP_USER}
+      - SAKURA_FRP_TOKEN=${SAKURA_FRP_TOKEN}
+    networks:
+      - hadoop
+
 networks:
   hadoop:
