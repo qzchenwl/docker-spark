@@ -27,5 +27,22 @@
     <name>hive.metastore.warehouse.dir</name>
     <value>/user/hive/warehouse</value>
   </property>
+
+  <property>
+    <name>hive.server2.authentication</name>
+    <value>NONE</value>
+  </property>
+  <property>
+    <name>hive.server2.enable.doAs</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>hive.server2.allow.user.substitution</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>hive.server2.require.username</name>
+    <value>true</value>
+  </property>
 </configuration>
 

@@ -31,3 +31,4 @@ insert into test_table values (1, \'hello\'), (2, \'world\');
 docker compose exec -it spark-master spark-sql -e 'select * from test_db.test_table;'
 
 docker exec -it spark-thriftserver /opt/bitnami/spark/bin/beeline -u jdbc:hive2://localhost:10000 -e 'select * from test_db.test_table;'
+
