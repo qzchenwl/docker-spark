@@ -5,7 +5,6 @@ English | [中文](README_zh.md)
 🚀 A comprehensive Spark testing environment with supporting Big Data tools, all containerized for easy setup and deployment!
 
 [![GitHub stars](https://img.shields.io/github/stars/qzchenwl/docker-spark.svg)](https://github.com/qzchenwl/docker-spark/stargazers)
-[![Docker Pulls](https://img.shields.io/docker/pulls/qzchenwl/docker-spark.svg)](https://hub.docker.com/r/qzchenwl/docker-spark)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## 🎯 Purpose
