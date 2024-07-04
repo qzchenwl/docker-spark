@@ -29,7 +29,7 @@ This project aims to provide a ready-to-use Spark testing environment, allowing 
 - Hadoop
 - Hive
 - PostgreSQL (for Hive metastore)
-- Firefox (for web UI access)
+- Firefox (for web UI access services in container network)
 - Frp client (for remote access)
 
 ## 📋 Dependencies
@@ -64,11 +64,14 @@ After the initial setup, start the testing environment with:
 
 ### Accessing Services
 
-- Spark Master: http://localhost:8080
-- Spark Thrift Server: jdbc:hive2://localhost:10001 (also accessible externally)
-- Hadoop NameNode: http://localhost:9870
-- YARN Resource Manager: http://localhost:8088
-- Hive Server: jdbc:hive2://localhost:10000
+| Service | Local URL | Container URL | Public URL |
+| ------- | --------- | ------------- | ---------- |
+| Spark Master | http://localhost:8080 | http://spark-master:8080 | - |
+| Spark Thrift Server | jdbc:hive2://localhost:10001 | jdbc:hive2://spark-thriftserver:10000 | jdbc:hive2://frp-fly.top:19943 (Edit confg/frp/frpc.ini to provide your own) |
+| Hadoop NameNode | http://localhost:9870 | http://hadoop-namenode:9870 | - |
+| YARN Resource Manager | http://localhost:8088 | http://hadoop-resourcemanager:8088 | - |
+| Hive Server | jdbc:hive2://localhost:10000 | jdbc:hive2://hive-server:10000 | - |
+| Firefox | http://localhost:5800 | - | - |
 
 ## 📚 Documentation
 
